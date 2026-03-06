@@ -284,6 +284,7 @@ function StepWall({ go }) {
   const [modal, setModal] = useState(null);
   const [synthesis, setSynthesis] = useState(null);
   const [synthLoading, setSynthLoading] = useState(false);
+  const [showSynth, setShowSynth] = useState(true);
   const [lastSync, setLastSync] = useState(null);
   const [syncing, setSyncing] = useState(false);
   const pollRef = useRef(null);
@@ -426,8 +427,9 @@ Español. Tono estratégico, cálido y accionable. Máx 350 palabras. **negritas
           <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: "var(--lime)", marginBottom: 22, display: "flex", alignItems: "center", gap: 12 }}>
             ✦ Síntesis colectiva KPL · {articles.length} artículo{articles.length > 1 ? "s" : ""}
             <span style={{ flex: 1, height: 1, background: "linear-gradient(90deg,rgba(200,245,60,0.3),transparent)", display: "inline-block" }} />
+            <button onClick={() => setShowSynth(s => !s)} style={{ background: "none", border: "1px solid var(--border2)", color: "var(--text3)", fontFamily: "'JetBrains Mono',monospace", fontSize: 9, letterSpacing: "0.15em", padding: "4px 10px", cursor: "pointer", textTransform: "uppercase" }}>{showSynth ? "Ocultar" : "Ver síntesis"}</button>
           </div>
-          <div>
+          {showSynth && <div>
             {synthesis.replace(/\*\*(.+?)\*\*/g, "§§$1§§").split("\n").filter(l => l.trim()).map((l, i) => {
               const parts = l.split("§§");
               return (
@@ -439,7 +441,7 @@ Español. Tono estratégico, cálido y accionable. Máx 350 palabras. **negritas
                 </p>
               );
             })}
-          </div>
+          </div>}
         </div>
       )}
 
@@ -508,5 +510,4 @@ export default function Home() {
     </>
   );
 }
-
 
