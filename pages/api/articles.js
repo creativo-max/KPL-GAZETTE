@@ -32,3 +32,24 @@ export default async function handler(req, res) {
 
   if (req.method === "POST") {
     try {
+      const { article } = req.body;
+      if (!article) return res.status(400).json({ error: "Missing article" });
+      const raw = await redisCommand("GET", "articles");
+      const articles = raw ? JSON.parse(raw) : [];
+      if (!articles.find((a) => a.id === article.id)) {
+        articles.unshift(article);
+      }
+      await redisCommand("SET", "articles", JSON.stringify(articles));
+      return res.status(200).json({ articles });
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
+    }
+  }
+
+  if (req.method === "DELETE") {
+    await redisCommand("DEL", "articles");
+    return res.status(200).json({ ok: true });
+  }
+
+  return res.status(405).json({ error: "Method not allowed" });
+}
