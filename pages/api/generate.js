@@ -27,10 +27,12 @@ export default async function handler(req, res) {
     const data = await response.json();
     if (data.error) return res.status(500).json({ error: data.error.message });
     const text = data.choices?.[0]?.message?.content || "";
-    res.status(200).json({ text });
+    return res.status(200).json({ text });
   } catch (err) {
     clearTimeout(timeout);
     if (err.name === "AbortError") {
       return res.status(504).json({ error: "La IA tardó demasiado. Intenta de nuevo." });
     }
-    res.status
+    return res.status(500).json({ error: err.message });
+  }
+}
