@@ -268,7 +268,7 @@ function StepArticle({ article, go, onPublish }) {
         </div>
       </div>
       <div style={{ display: "flex", gap: 10, marginTop: 24, flexWrap: "wrap" }}>
-        <button className="btn-primary" style={{ ...S.btn, ...S.bP }} onClick={() => { onPublish(article); go("wall"); }}>📰 Publicar en portada →</button>
+        <button className="btn-primary" style={{ ...S.btn, ...S.bP }} onClick={async () => { await onPublish(article); go("wall"); }}>📰 Publicar en portada →</button>
         <button className="btn-ghost" style={{ ...S.btn, ...S.bG }} onClick={() => go("write")}>← Editar</button>
         <button className="btn-ghost" style={{ ...S.btn, ...S.bG }} onClick={() => go("wall")}>Ver portada</button>
       </div>
