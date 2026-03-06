@@ -1,30 +1,47 @@
-// Simple in-memory store that persists via Vercel's serverless functions
-// For production persistence we use a JSON store on a free service
-// Articles are stored as shared state
+const UPSTASH_URL = process.env.KV_REST_API_URL;
+const UPSTASH_TOKEN = process.env.KV_REST_API_TOKEN;
 
-let articles = [];
+async function redisCommand(...args) {
+  const response = await fetch(`${UPSTASH_URL}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${UPSTASH_TOKEN}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(args),
+  });
+  const data = await response.json();
+  return data.result;
+}
 
-export default function handler(req, res) {
-  // Allow CORS
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-  if (req.method === "OPTIONS") return res.status(200).end();
-
+export default async function handler(req, res) {
   if (req.method === "GET") {
-    return res.status(200).json({ articles });
+    try {
+      const raw = await redisCommand("GET", "articles");
+      const articles = raw ? JSON.parse(raw) : [];
+      return res.status(200).json(articles);
+    } catch {
+      return res.status(200).json([]);
+    }
   }
 
   if (req.method === "POST") {
-    const { article } = req.body;
-    if (!article) return res.status(400).json({ error: "Missing article" });
-    // Avoid duplicates
-    if (!articles.find((a) => a.id === article.id)) {
-      articles = [article, ...articles];
+    try {
+      const article = req.body;
+      const raw = await redisCommand("GET", "articles");
+      const articles = raw ? JSON.parse(raw) : [];
+      articles.unshift(article);
+      await redisCommand("SET", "articles", JSON.stringify(articles));
+      return res.status(200).json({ ok: true });
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
     }
-    return res.status(200).json({ articles });
   }
 
-  return res.status(405).json({ error: "Method not allowed" });
+  if (req.method === "DELETE") {
+    await redisCommand("DEL", "articles");
+    return res.status(200).json({ ok: true });
+  }
+
+  res.status(405).json({ error: "Method not allowed" });
 }
