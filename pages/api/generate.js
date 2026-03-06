@@ -4,6 +4,10 @@ export default async function handler(req, res) {
   if (!prompt) return res.status(400).json({ error: "Missing prompt" });
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) return res.status(500).json({ error: "API key no configurada" });
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 25000);
+
   try {
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
@@ -17,12 +21,16 @@ export default async function handler(req, res) {
         max_tokens: 1024,
         temperature: 0.9,
       }),
+      signal: controller.signal,
     });
+    clearTimeout(timeout);
     const data = await response.json();
     if (data.error) return res.status(500).json({ error: data.error.message });
     const text = data.choices?.[0]?.message?.content || "";
     res.status(200).json({ text });
   } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-}
+    clearTimeout(timeout);
+    if (err.name === "AbortError") {
+      return res.status(504).json({ error: "La IA tardó demasiado. Intenta de nuevo." });
+    }
+    res.status
