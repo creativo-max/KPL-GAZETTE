@@ -15,24 +15,32 @@ async function redisCommand(...args) {
 }
 
 export default async function handler(req, res) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  if (req.method === "OPTIONS") return res.status(200).end();
+
   if (req.method === "GET") {
     try {
       const raw = await redisCommand("GET", "articles");
       const articles = raw ? JSON.parse(raw) : [];
-      return res.status(200).json(articles);
+      return res.status(200).json({ articles });
     } catch {
-      return res.status(200).json([]);
+      return res.status(200).json({ articles: [] });
     }
   }
 
   if (req.method === "POST") {
     try {
-      const article = req.body;
+      const { article } = req.body;
+      if (!article) return res.status(400).json({ error: "Missing article" });
       const raw = await redisCommand("GET", "articles");
       const articles = raw ? JSON.parse(raw) : [];
-      articles.unshift(article);
+      if (!articles.find((a) => a.id === article.id)) {
+        articles.unshift(article);
+      }
       await redisCommand("SET", "articles", JSON.stringify(articles));
-      return res.status(200).json({ ok: true });
+      return res.status(200).json({ articles });
     } catch (err) {
       return res.status(500).json({ error: err.message });
     }
