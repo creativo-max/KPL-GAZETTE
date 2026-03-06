@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   if (!apiKey) return res.status(500).json({ error: "API key no configurada" });
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 25000);
+  const timeout = setTimeout(() => controller.abort(), 45000);
 
   try {
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
