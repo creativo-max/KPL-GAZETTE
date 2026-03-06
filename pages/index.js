@@ -325,27 +325,26 @@ function StepWall({ go }) {
   const generateSynthesis = async () => {
     if (!articles.length) return;
     setSynthLoading(true); setSynthesis(null);
-    const summaries = articles.map((a, i) => `${i+1}. [${a.author}${a.role ? " · " + a.role : ""}] "${a.headline}" (${a.category}, ${a.year}) — ${a.body.substring(0,250)}`).join("\n\n");
-    const prompt = `Eres un facilitador experto en estrategia y cultura de equipos.
-El equipo de KPL escribió estas noticias del futuro. KPL es un despacho contable en Mérida, Yucatán que integró inteligencia artificial a sus servicios.
+    const summaries = articles.map((a, i) => `${i+1}. [${a.author}] "${a.headline}" (${a.category}, ${a.year}) — ${(a.body||"").substring(0,120)}`).join("\n");
+    const prompt = `Eres un facilitador de estrategia de equipos. El equipo KPL (despacho contable con IA, Mérida, Yucatán) escribió estas noticias del futuro:
 
 ${summaries}
 
-Crea una SÍNTESIS COLECTIVA con esta estructura:
+Crea una SÍNTESIS COLECTIVA en español con estas 4 secciones (usa **negritas** solo para los títulos):
 
 **TEMAS EN COMÚN**
-2-3 patrones que emergen de los artículos del equipo.
+2-3 patrones que emergen de los artículos.
 
 **LA VISIÓN COLECTIVA DE KPL**
-Párrafo inspirador (3-4 oraciones) que captura el futuro co-imaginado.
+Párrafo inspirador de 3 oraciones.
 
 **TENSIONES CREATIVAS**
-1-2 diferencias interesantes entre las visiones que vale explorar en equipo.
+1-2 diferencias interesantes entre visiones.
 
 **PREGUNTAS ESTRATÉGICAS**
-3 preguntas concretas que KPL debería responder para hacer realidad esta visión.
+3 preguntas concretas para hacer realidad esta visión.
 
-Español. Tono estratégico, cálido y accionable. Máx 350 palabras. **negritas** solo para títulos de sección.`;
+Tono estratégico y cálido. Máximo 280 palabras.`;
     try {
       const text = await callClaude(prompt);
       setSynthesis(text);
@@ -510,4 +509,3 @@ export default function Home() {
     </>
   );
 }
-
