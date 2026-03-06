@@ -403,7 +403,7 @@ Español. Tono estratégico, cálido y accionable. Máx 350 palabras. **negritas
               )}
               <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--lime)", marginBottom: 9, opacity: 0.7 }}>{art.category}</div>
               <div className="card-hl" style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 19, lineHeight: 1.1, letterSpacing: "0.02em", marginBottom: 9, transition: "color 0.2s" }}>{art.headline}</div>
-              <div style={{ fontSize: 12, lineHeight: 1.6, color: "var(--text3)", marginBottom: 12, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" }}>{art.body.substring(0,150)}…</div>
+              <div style={{ fontSize: 12, lineHeight: 1.6, color: "var(--text3)", marginBottom: 12, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" }}>{(art.body || "").substring(0,150)}…</div>
               <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 9, letterSpacing: "0.1em", color: "var(--text3)", paddingTop: 12, borderTop: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span>{art.author}{art.role ? ` · ${art.role}` : ""}</span>
                 <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 17, color: "var(--border2)" }}>{art.year}</span>
@@ -508,3 +508,5 @@ export default function Home() {
     </>
   );
 }
+
+
